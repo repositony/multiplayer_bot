@@ -68,6 +68,62 @@ Headless linux OS, LGSM, wine, steamcmd, user spaces
 
 ### Slash commands
 
+"Slash commands" are what people can type into any chat on the discord server
+to interact with the bot.
+
+General commands:
+
+| Command | Description                                  |
+| ------- | -------------------------------------------- |
+| /help   | Show general help information                |
+| /ip     | Latest public IP for connection              |
+| /list   | List of available servers and current status |
+
+Game-specific commands:
+
+| Command           | Description                         |
+| ----------------- | ----------------------------------- |
+| /help    \<game\> | Help for setting up a specific game |
+| /start   \<game\> | Start the server                    |
+| /stop    \<game\> | Stop the server                     |
+| /restart \<game\> | Restart the server                  |
+| /update  \<game\> | Update the server (if possible)     |
+
+By registering a `Command` all slash commands have autocomplete, suggestions,
+and descriptions in the discord UI.
+
+For example:
+
+```rust
+pub fn register() -> CreateCommand {
+    CreateCommand::new("list").description("List current status of all servers")
+}
+```
+
+This includes slash commands that have arguments, such as `/help` where the name
+of a game may be given. These may be set up via the `CreateCommandOption` type.
+
+```rust
+pub fn register() -> CreateCommand {
+    // Add optional "game" argument
+    let mut options =
+        CreateCommandOption::new(CommandOptionType::String, 
+            "game", 
+            "Name of the game server")
+            .required(false);
+        
+    // Add all known games for autocomplete and suggestions
+    for game in GAME_SERVERS.iter() {
+        options = options.add_string_choice(game.name(), game.name())
+    }
+
+    // Finalise the help command to be registered
+    CreateCommand::new("help")
+        .description("Help information")
+        .add_option(options)
+}
+```
+
 ### Tokens
 
 Tokens setup for the discord developer portal and guilds, etc...
