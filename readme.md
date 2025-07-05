@@ -3,6 +3,8 @@
 A Discord bot to manage active self-hosted dedicated game servers for our gaming
 community.
 
+![image](https://github.com/user-attachments/assets/d9ac5f66-9cbc-4743-98e2-c4554d635c9b)
+
 ## Overview
 
 This bot was created specifically for our needs and not plug-and-play at all.
@@ -86,7 +88,9 @@ Game-specific commands:
 | /update  \<game\> | Update the server (if possible)     |
 
 By registering a `Command` all slash commands have autocomplete, suggestions,
-and descriptions in the discord UI.
+and descriptions in the discord UI. It looks something like this for people to cklick on or `tab` to autocomplete:
+
+![image](https://github.com/user-attachments/assets/ac8f30dc-40cd-4e72-8c96-e9e0c428e5ac)
 
 For example:
 
