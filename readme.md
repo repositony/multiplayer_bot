@@ -62,10 +62,6 @@ up the corresponding dedicated game server.
 
 ## Implementation details
 
-### Host server setup
-
-Headless linux OS, LGSM, wine, steamcmd, user spaces
-
 ### Slash commands
 
 "Slash commands" are what people can type into any chat on the discord server
@@ -124,9 +120,62 @@ pub fn register() -> CreateCommand {
 }
 ```
 
-### Tokens
+### Host server setup
 
-Tokens setup for the discord developer portal and guilds, etc...
+Headless linux OS, LGSM, wine, steamcmd, user spaces
+
+#### Linux game servers
+
+#### Windows game servers
+
+### Tokens/identifiers
+
+The [discord developer portal](https://discord.com/developers/docs/intro) is where the authorisation token for the bot may be set. Go to `Applications>Bot>Token` and regenerate if you lost it. The client must be initialised, which I have stored in `BOT_TOKEN` (read from an environment variable on the host).
+
+```rust
+    // build the client
+    let mut client = Client::builder(tokens::BOT_TOKEN.as_str(), GatewayIntents::empty())
+        .event_handler(events::Handler)
+        .await
+        .expect("Error creating client");
+```
+
+The only other identifiers needed are the server or "guild" ID of the discord server you want to add the bot to, and for any particular role or members you want permissions control over.
+
+In this case:
+
+- Guild ID is used to add slash commands and autocomplete
+
+    ```rust
+        // Register slash commands to the guild
+        let commands = &tokens::GUILD_ID
+            .set_commands(
+                &ctx.http,
+                vec![
+                    commands::help::register(),
+                    commands::ip::register(),
+                    commands::list::register(),
+                    commands::restart::register(),
+                    commands::start::register(),
+                    commands::stop::register(),
+                    commands::update::register(),
+                ],
+            )
+            .await;
+    ```
+
+- Role ID is used to limit bot use to trusted members
+
+    ```rust
+    /// Check to see if the user belongs to the trusted role
+    fn is_trusted_member(command: &CommandInteraction) -> bool {
+        if let Some(member) = command.member.as_ref() {
+            member.roles.contains(&tokens::TRUSTED_ROLE_ID)
+        } else {
+            false
+        }
+    }
+    ```
 
 ### Implementation
 
