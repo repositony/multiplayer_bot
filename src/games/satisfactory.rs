@@ -30,13 +30,15 @@ impl GameServer for Server<'_> {
     fn help_message(&self) -> String {
         format!(
             "## Help for Satisfactory\n\
-            The first person to use this will set up the server and admin\n\
+            Vanilla satisfactory server, version 1.1\n\
             ### Installation\n\
             - Install Satisfactory\n\
             - Click play\n\
             ### Connection\n\
+            - Server Manager > Add Server\n\
             - Connect to {0}:{1} directly\n\n\
-            Ask Tony about if you want mods added.\n",
+            The server password is \"aids\" if it asks you to authenticate\n\n\
+            Note: v1.1 has shitty cpu usage when idle, please use `/stop` when you are done playing until they can fix it\n",
             games::public_ip(),
             self.port()
         )
