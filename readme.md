@@ -122,11 +122,79 @@ pub fn register() -> CreateCommand {
 
 ### Host server setup
 
-Headless linux OS, LGSM, wine, steamcmd, user spaces
+The home server runs a headless ubuntu OS, and every game server is managed user a new user. This is good to do for several reasons:
+
+- Game servers are self-contained with their own user environment
+- Permissions may be extremely limited to prevent access to other user data or other important server configs
+- Scalable to many games without becoming a complete mess
+
+The approach differs for the type of dedicated game server, but essentially all the bot does is run the relevant `start`/`stop`/`etc...` command as the appropriate user. Note that the bot itself must be run by a separate managing user with access to every game server user.
 
 #### Linux game servers
 
+Where possible, the [Linux Game Server Manager (LGSM)](https://linuxgsm.com) is used to make everything extremely easy.
+
+This provides a single point of control, with the following fully implemented:
+
+- start
+- stop
+- restart
+- update
+- backup
+
+Along with several other management commands. Since this is consistent between all LGSM servers the bot only needs to call this.
+
+For example:
+
+``` bash
+# Discord command
+/start minecraft    
+
+# Bot runs (as the "minecraft" user)
+/home/mincraft/mcserver start
+```
+
+Simple.
+
+Servers not available through LGSM need to be set up differently. I use `tmux` as the easiest way of starting and stopping a game server in a detached terminal.
+
+Now the slash commands trigger a `tmux` session as needed:
+
+| Command           | Host server side                                          |
+| ----------------- | --------------------------------------------------------- |
+| /start   \<game\> | `tmux new-session -d -s <session_name> <game_executable>` |
+| /stop    \<game\> | `tmux kill-session -t <session_name>`                     |
+| /restart \<game\> | `tmux kill-session` followed by `tmux new-session`        |
+| /update  \<game\> | `/usr/games/steamcmd` with relevant update arguments      |
+
 #### Windows game servers
+
+Windows-based game servers are insane to me, but some games insist on it.
+
+The only difference to the manual `tmux` method used for the linux game servers are that:
+
+- The wine executable path is pre=prended to  (`/usr/bin/wine`)
+- `steamcmd` uses the `+@sSteamCmdForcePlatformType windows` argument for updates
+
+Wine ([Wine Is Not an Emulator](https://www.winehq.org/)) is a compatibility layer capable of running dumbass Windows-only applications where they shouldn't be, like on Linux or MacOS.
+
+```shell
+# install (obviously look up your platform)
+sudo apt install wine64
+
+# run the setup
+wine setup.exe
+```
+
+Enshrouded and Space Engineers are examples of this, where the executable is run with wine for compatibility.
+
+``` bash
+# Discord command
+/start enshrouded    
+
+# Bot runs (as the "enshrouded" user)
+/usr/bin/wine /path/to/enshrouded_server.exe 
+```
 
 ### Tokens/identifiers
 
@@ -177,12 +245,52 @@ In this case:
     }
     ```
 
-### Implementation
+### Adding new games
 
-`GameServer` trait, `GAME_SERVERS` array, async rust
+While not the cleanest implementation, it is fairly simple to add to and more than good enough for our needs.
+
+1. When a new game server is set up, a new file is added to `src/games/`. For example `new_game.rs`.
+
+2. Inside `new_game.rs` a structure to represent the game server config, e.g. `Server`. This must implement the `GameServer` trait at a minimum.
+
+    ```rust
+    pub trait GameServer: Send + Sync {
+        fn new() -> Self
+        where
+            Self: Sized;
+        fn name(&self) -> &str;
+        fn description(&self) -> &str;
+        fn port(&self) -> u16;
+        fn help_message(&self) -> String;
+        fn start(&self) -> String;
+        fn stop(&self) -> String;
+        fn restart(&self) -> String;
+        fn update(&self) -> String;
+        fn status(&self) -> String;
+    }
+    ```
+
+    Most dont need to do anything, but in general they simply run a command on the host server and return a message to post in discord.
+
+3. Add the new config to the list of games you want to make available to the discord server
+
+    ```rust
+    /// Array of all game servers to add to the manager
+    pub static GAME_SERVERS: LazyLock<[Box<dyn GameServer>; 4]> = LazyLock::new(|| {
+        [
+            Box::new(game_1::Server::new()),
+            Box::new(game_2::Server::new()),
+            Box::new(game_3::Server::new()),
+            Box::new(new_game::Server::new()), // <-- new game server
+        ]
+    });
+    ```
+
+    Why make it lazy? who knows, this was written one weekend in a bit of an async-related haze. I'll make it just a normal static at some point.
 
 ## Work-in-progress
 
 - Implement a logger
+- Get rid of the lazylock game servers
 - Clean up code and document in detail
 - Remove command clone workaround
