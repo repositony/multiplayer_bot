@@ -2,19 +2,19 @@ mod enshrouded;
 mod satisfactory;
 mod sevendays;
 mod skyvaults;
-mod vaulthunters;
+// mod vaulthunters;
 mod zomboid;
 
 use std::sync::LazyLock;
 
 /// Array of all game servers to add to the manager
-pub static GAME_SERVERS: LazyLock<[Box<dyn GameServer>; 6]> = LazyLock::new(|| {
+pub static GAME_SERVERS: LazyLock<[Box<dyn GameServer>; 5]> = LazyLock::new(|| {
     [
         Box::new(sevendays::Server::new()),
         Box::new(enshrouded::Server::new()),
         Box::new(satisfactory::Server::new()),
         Box::new(skyvaults::Server::new()),
-        Box::new(vaulthunters::Server::new()),
+        // Box::new(vaulthunters::Server::new()),
         Box::new(zomboid::Server::new()),
     ]
 });
