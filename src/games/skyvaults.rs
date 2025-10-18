@@ -32,6 +32,7 @@ impl GameServer for Server<'_> {
             "## Help for Skyvaults\n\
             Skyvaults is just Vaulthunters + skyblock world generation. \
             Simply download Vaulthunters v3 as normal to play.\n\
+            Current version: 3.19.6.4\n\
             ### Installation\n\
             - Download curseforge (<https://www.curseforge.com/download/app>)\n\
             - Install the Vault Hunters v3 modpack\n\
