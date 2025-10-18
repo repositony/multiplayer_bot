@@ -58,7 +58,7 @@ impl GameServer for Server<'_> {
             - Connect to {0}:{1} directly\n\n\
             Via steam:\n\
             - View>Game Servers>Favorites>Add {0}:{1}\n\n\
-            :lock: The server password is \"aids\"\n\
+            Server password: aids\n\
             ### Server settings\n\
             - Default difficulty\n\
             - 45/15 minute day/night cycle\n",
@@ -69,7 +69,7 @@ impl GameServer for Server<'_> {
 
     fn start(&self) -> String {
         if self.tmux_session_exists() {
-            return format!("✅ The {} server is already running", self.name());
+            return format!("The {} server is already running", self.name());
         }
 
         let status = std::process::Command::new("sudo")
@@ -85,10 +85,10 @@ impl GameServer for Server<'_> {
             .expect("failed to execute tmux");
 
         if status.success() {
-            format!("✅ The {} server started successfully", self.name())
+            format!("The {} server started successfully", self.name())
         } else {
             format!(
-                "❌ The {} server failed to start, ask Tony to fix it",
+                "The {} server failed to start, ask Tony to fix it",
                 self.name()
             )
         }
@@ -96,7 +96,7 @@ impl GameServer for Server<'_> {
 
     fn stop(&self) -> String {
         if !self.tmux_session_exists() {
-            return format!("✅ The {} server is already stopped", self.name());
+            return format!("The {} server is already stopped", self.name());
         }
 
         let status = std::process::Command::new("sudo")
@@ -110,10 +110,10 @@ impl GameServer for Server<'_> {
             .expect("failed to execute tmux");
 
         if status.success() {
-            format!("✅ The {} server stopped successfully", self.name())
+            format!("The {} server stopped successfully", self.name())
         } else {
             format!(
-                "❌ The {} server failed to stop, ask Tony to fix it",
+                "The {} server failed to stop, ask Tony to fix it",
                 self.name()
             )
         }
@@ -144,10 +144,10 @@ impl GameServer for Server<'_> {
             .expect("failed to execute tmux");
 
         if status.success() {
-            format!("✅ The {} server restarted successfully", self.name())
+            format!("The {} server restarted successfully", self.name())
         } else {
             format!(
-                "❌ The {} server failed to restart, ask Tony to fix it",
+                "The {} server failed to restart, ask Tony to fix it",
                 self.name()
             )
         }
@@ -175,17 +175,17 @@ impl GameServer for Server<'_> {
 
         let stdout = String::from_utf8_lossy(&output.stdout);
         if stdout.contains("Success!") {
-            format!("✅ The {} server updated successfully", self.name())
+            format!("The {} server updated successfully", self.name())
         } else {
-            format!("❌ The {} server failed to update, ask Tony)", self.name())
+            format!("The {} server failed to update, ask Tony)", self.name())
         }
     }
 
     fn status(&self) -> String {
         if self.tmux_session_exists() {
-            ":arrow_forward: Running".to_string()
+            "Running".to_string()
         } else {
-            ":stop_button: Idle".to_string()
+            "Idle".to_string()
         }
     }
 }

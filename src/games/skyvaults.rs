@@ -38,7 +38,7 @@ impl GameServer for Server<'_> {
             - Click play\n\
             ### Connection\n\
             - Connect to {0}:{1}\n\n\
-            \u{26A0} NOTE THE PORT CHANGE TO {1} \u{26A0}\n\n",
+            **NOTE THE PORT CHANGE TO {1}**\n\n",
             games::public_ip(),
             self.port()
         )
@@ -54,12 +54,12 @@ impl GameServer for Server<'_> {
             .expect("failed to execute process");
 
         if status.success() {
-            format!("✅ The {} server started successfully", self.name())
+            format!("The {} server started successfully", self.name())
         } else if status.code() == Some(2) {
-            format!("✅ The {} server is already running", self.name())
+            format!("The {} server is already running", self.name())
         } else {
             format!(
-                "❌ The {} server failed to start, ask Tony to fix it)",
+                "The {} server failed to start, ask Tony to fix it)",
                 self.name()
             )
         }
@@ -75,11 +75,11 @@ impl GameServer for Server<'_> {
             .expect("failed to execute process");
 
         if status.success() {
-            format!("✅ The {} server stopped successfully", self.name())
+            format!("The {} server stopped successfully", self.name())
         } else if status.code() == Some(2) {
-            format!("✅ The {} server is already stopped", self.name())
+            format!("The {} server is already stopped", self.name())
         } else {
-            format!("❌ The {} server failed to stop, ask Tony)", self.name())
+            format!("The {} server failed to stop, ask Tony)", self.name())
         }
     }
 
@@ -93,15 +93,15 @@ impl GameServer for Server<'_> {
             .expect("failed to execute process");
 
         if status.success() {
-            format!("✅ The {} server restarted successfully", self.name())
+            format!("The {} server restarted successfully", self.name())
         } else {
-            format!("❌ The {} server failed to restart, ask Tony)", self.name())
+            format!("The {} server failed to restart, ask Tony)", self.name())
         }
     }
 
     fn update(&self) -> String {
         format!(
-            "❌ The {} server must be updated manually, ask Tony",
+            "The {} server must be updated manually, ask Tony",
             self.name()
         )
     }
@@ -120,12 +120,12 @@ impl GameServer for Server<'_> {
             .output()
         {
             match String::from_utf8_lossy(&status.stdout).trim() {
-                "1" => ":arrow_forward: Running".to_string(),
-                "0" => ":stop_button: Idle".to_string(),
-                _ => "\u{2753} Unknown".to_string(),
+                "1" => "Running".to_string(),
+                "0" => "Idle".to_string(),
+                _ => "Unknown".to_string(),
             }
         } else {
-            "\u{2753} Unknown".to_string()
+            "Unknown".to_string()
         }
     }
 }
