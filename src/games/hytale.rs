@@ -10,8 +10,8 @@ pub struct Server<'a> {
 impl GameServer for Server<'_> {
     fn new() -> Self {
         Server {
-            user: "gs_hytaler",
-            runner: "hytale",
+            user: "gs_hytale",
+            runner: "hytale.service",
         }
     }
 
@@ -28,114 +28,111 @@ impl GameServer for Server<'_> {
     }
 
     fn help_message(&self) -> String {
-        // todo: get release version
-        // todo: instructions for hytale specifics
+        // get release version
+        let version = match std::process::Command::new("su")
+            .arg("-")
+            .arg(self.user)
+            .arg("-c")
+            .arg(format!("./hytale_downloader -print-version"))
+            .output()
+        {
+            Ok(o) if o.status.success() => String::from_utf8_lossy(&o.stdout).trim().to_string(),
+            Ok(o) => {
+                println!("version: {o:?}");
+                "failed".to_string()
+            }
+            _ => "Unknown".to_string(),
+        };
+
         format!(
             "## Help for Hytale\n\
-            Hytale server\n\
+            Hytale server, currently vanilla \n\
+            (version: {2})\n\
             ### Installation\n\
-            - Install hytale\n\
-            - Click play\n\
+            - Install hytale from [here](<https://www.curseforge.com/download/app>)\n\
+            - Follow purchase/setup instructions\n\
             ### Connection\n\
-            - Server Manager > Add Server\n\
-            - Connect to {0}:{1} directly\n\n\
-            Server password: aids\n\n",
+            - Server > Add Server\n\
+              - Connection address: {0}:{1}\n\
+              - Name: Brumders\n\
+            - Connect to the server\n\
+            - Password prompt: `aids`\n\n",
             games::public_ip(),
-            self.port()
+            self.port(),
+            version,
         )
     }
 
     fn start(&self) -> String {
-        let status = std::process::Command::new("su")
-            .arg("-")
-            .arg(self.user)
-            .arg("-c")
-            .arg(format!("/home/{}/{} start", self.user, self.runner))
-            .status()
-            .expect("failed to execute process");
+        let status = std::process::Command::new("systemctl")
+            .args(["start", self.runner])
+            .status();
 
-        if status.success() {
-            format!("The {} server started successfully", self.name())
-        } else if status.code() == Some(2) {
-            format!("The {} server is already running", self.name())
-        } else {
-            format!(
-                "The {} server failed to start, ask Tony to fix it)",
-                self.name()
-            )
+        match status {
+            Ok(s) if s.success() => {
+                format!("The {} server started successfully", self.name())
+            }
+            // systemctl returns 0 even if already active, but keep this for safety
+            Ok(s) if matches!(s.code(), Some(2)) => {
+                format!("The {} server is already running", self.name())
+            }
+            _ => {
+                format!(
+                    "The {} server failed to start, ask Tony to fix it",
+                    self.name()
+                )
+            }
         }
     }
 
     fn stop(&self) -> String {
-        let status = std::process::Command::new("su")
-            .arg("-")
-            .arg(self.user)
-            .arg("-c")
-            .arg(format!("/home/{}/{} stop", self.user, self.runner))
-            .status()
-            .expect("failed to execute process");
+        let status = std::process::Command::new("systemctl")
+            .args(["stop", self.runner])
+            .status();
 
-        if status.success() {
-            format!("The {} server stopped successfully", self.name())
-        } else if status.code() == Some(2) {
-            format!("The {} server is already stopped", self.name())
-        } else {
-            format!("The {} server failed to stop, ask Tony)", self.name())
+        match status {
+            Ok(s) if s.success() => {
+                format!("The {} server stopped successfully", self.name())
+            }
+            // Same note as above
+            Ok(s) if matches!(s.code(), Some(2)) => {
+                format!("The {} server is already stopped", self.name())
+            }
+            _ => {
+                format!("The {} server failed to stop, ask Tony", self.name())
+            }
         }
     }
 
     fn restart(&self) -> String {
-        let status = std::process::Command::new("su")
-            .arg("-")
-            .arg(self.user)
-            .arg("-c")
-            .arg(format!("/home/{}/{} restart", self.user, self.runner))
+        let status = std::process::Command::new("systemctl")
+            .args(["restart", self.runner])
             .status()
-            .expect("failed to execute process");
+            .expect("failed to execute systemctl");
 
         if status.success() {
             format!("The {} server restarted successfully", self.name())
         } else {
-            format!("The {} server failed to restart, ask Tony)", self.name())
+            format!("The {} server failed to restart, ask Tony", self.name())
         }
     }
 
     fn update(&self) -> String {
-        let status = std::process::Command::new("su")
-            .arg("-")
-            .arg(self.user)
-            .arg("-c")
-            .arg(format!("/home/{}/{} update", self.user, self.runner))
-            .status()
-            .expect("failed to execute process");
-
-        if status.success() {
-            format!("The {} server updated successfully", self.name())
-        } else {
-            format!("The {} server failed to update, ask Tony)", self.name())
-        }
+        format!(
+            "The {} server must be updated manually, ask Tony",
+            self.name()
+        )
     }
 
     fn status(&self) -> String {
-        let check = &format!(
-            "[ -e /home/{}/lgsm/lock/{}-started.lock ] && echo 1 || echo 0",
-            self.user, self.runner
-        );
-
-        if let Ok(status) = std::process::Command::new("su")
-            .arg("-")
-            .arg(self.user)
-            .arg("-c")
-            .arg(format!("bash -c '{}'", check))
-            .output()
+        match std::process::Command::new("systemctl")
+            .args(["is-active", "--quiet", "hytale"])
+            .status()
         {
-            match String::from_utf8_lossy(&status.stdout).trim() {
-                "1" => "Running".to_string(),
-                "0" => "Idle".to_string(),
-                _ => "Unknown".to_string(),
-            }
-        } else {
-            "Unknown".to_string()
+            Ok(s) if s.success() => "Running",
+            Ok(s) if matches!(s.code(), Some(1 | 3)) => "Idle",
+            _ => "Unknown",
         }
+        .to_string()
     }
 }
