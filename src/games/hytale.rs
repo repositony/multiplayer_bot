@@ -53,6 +53,7 @@ impl GameServer for Server<'_> {
             - [EyeSpy](<https://legacy.curseforge.com/hytale/mods/eyespy>)\n\
             - [BetterMap](<https://legacy.curseforge.com/hytale/mods/bettermap>)\n\
             - [Where this at?](<https://legacy.curseforge.com/hytale/mods/where-this-at>)\n\
+            - [AutoSort](<https://www.curseforge.com/hytale/mods/autosort>)\n\
             - [Bigger ore stacks](<https://legacy.curseforge.com/hytale/mods/bigger-ore-stacks>)\n\n",
             games::public_ip(),
             self.port(),
