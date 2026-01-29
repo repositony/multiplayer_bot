@@ -29,34 +29,31 @@ impl GameServer for Server<'_> {
 
     fn help_message(&self) -> String {
         // get release version
-        let version = match std::process::Command::new("su")
-            .arg("-")
-            .arg(self.user)
-            .arg("-c")
-            .arg(format!("./hytale_downloader -print-version"))
-            .output()
-        {
-            Ok(o) if o.status.success() => String::from_utf8_lossy(&o.stdout).trim().to_string(),
-            Ok(o) => {
-                println!("version: {o:?}");
-                "failed".to_string()
-            }
-            _ => "Unknown".to_string(),
-        };
+        let version =
+            read_version_from_file(format!("/home/{}/updates/server_version.dat", self.user));
 
         format!(
             "## Help for Hytale\n\
-            Hytale server, currently vanilla \n\
-            (version: {2})\n\
+            Hytale server (version: {2})\n\
             ### Installation\n\
             - Install hytale from [here](<https://www.curseforge.com/download/app>)\n\
             - Follow purchase/setup instructions\n\
             ### Connection\n\
             - Server > Add Server\n\
-              - Connection address: {0}:{1}\n\
-              - Name: Brumders\n\
+            - Connection address: {0}:{1}\n\
+            - Name: Brumders\n\
             - Connect to the server\n\
-            - Password prompt: `aids`\n\n",
+            - Password prompt: `aids`\n\
+            ### Updates\n\
+            The server should detect new patches/versions automatically at 3am and update itself.\n\n\
+            If you need to you can force an update with `/update game hytale`. This will take about 5-10 mins if an update is actually required.\n\
+            ### Mods\n\
+            Mods are all server-side, you don't have to do anything. Currently minimal while Hytale is constantly updating.\n\n\
+            Installed mods:\n\
+            - [EyeSpy](<https://legacy.curseforge.com/hytale/mods/eyespy>)\n\
+            - [BetterMap](<https://legacy.curseforge.com/hytale/mods/bettermap>)\n\
+            - [Where this at?](<https://legacy.curseforge.com/hytale/mods/where-this-at>)\n\
+            - [Bigger ore stacks](<https://legacy.curseforge.com/hytale/mods/bigger-ore-stacks>)\n\n",
             games::public_ip(),
             self.port(),
             version,
@@ -70,17 +67,24 @@ impl GameServer for Server<'_> {
 
         match status {
             Ok(s) if s.success() => {
-                format!("The {} server started successfully", self.name())
+                format!(
+                    "{} server started ({}:{})",
+                    self.name(),
+                    games::public_ip(),
+                    self.port(),
+                )
             }
             // systemctl returns 0 even if already active, but keep this for safety
             Ok(s) if matches!(s.code(), Some(2)) => {
-                format!("The {} server is already running", self.name())
+                format!(
+                    "{} server already running ({}:{})",
+                    self.name(),
+                    games::public_ip(),
+                    self.port(),
+                )
             }
             _ => {
-                format!(
-                    "The {} server failed to start, ask Tony to fix it",
-                    self.name()
-                )
+                format!("{} server failed to start, ask Tony to fix it", self.name())
             }
         }
     }
@@ -111,17 +115,52 @@ impl GameServer for Server<'_> {
             .expect("failed to execute systemctl");
 
         if status.success() {
-            format!("The {} server restarted successfully", self.name())
+            format!(
+                "{} server restarted ({}:{})",
+                self.name(),
+                games::public_ip(),
+                self.port(),
+            )
         } else {
             format!("The {} server failed to restart, ask Tony", self.name())
         }
     }
 
     fn update(&self) -> String {
-        format!(
-            "The {} server must be updated manually, ask Tony",
-            self.name()
-        )
+        let installed_version =
+            read_version_from_file("/home/gs_hytale/updates/server_version.dat");
+
+        let latest_version = match std::process::Command::new("su")
+            .arg("-")
+            .arg(self.user)
+            .arg("-c")
+            .arg("/home/gs_hytale/updates/hytale_downloader -print-version")
+            .output()
+        {
+            Ok(output) => String::from_utf8_lossy(&output.stdout).trim().to_string(),
+            _ => "none".to_string(),
+        };
+
+        if installed_version == latest_version {
+            return format!("{} server already latest version", self.name());
+        }
+
+        if let Ok(_) = std::process::Command::new("su")
+            .arg("-")
+            .arg(self.user)
+            .arg("-c")
+            .arg("/home/gs_hytale/updates/update_hytale_server.sh")
+            .status()
+        {
+            format!(
+                "{} server updated ({}:{})",
+                self.name(),
+                games::public_ip(),
+                self.port(),
+            )
+        } else {
+            format!("{} server failed to update, ask Tony", self.name())
+        }
     }
 
     fn status(&self) -> String {
@@ -134,5 +173,14 @@ impl GameServer for Server<'_> {
             _ => "Unknown",
         }
         .to_string()
+    }
+}
+
+fn read_version_from_file<P: AsRef<std::path::Path>>(path: P) -> String {
+    // Read the entire file into a string
+    if let Ok(contents) = std::fs::read_to_string(path) {
+        contents.trim().to_string()
+    } else {
+        "unknown".into()
     }
 }
