@@ -50,11 +50,15 @@ impl GameServer for Server<'_> {
             ### Mods\n\
             Mods are all server-side, you don't have to do anything. Currently minimal while Hytale is constantly updating.\n\n\
             Installed mods:\n\
-            - [EyeSpy](<https://legacy.curseforge.com/hytale/mods/eyespy>)\n\
-            - [BetterMap](<https://legacy.curseforge.com/hytale/mods/bettermap>)\n\
-            - [Where this at?](<https://legacy.curseforge.com/hytale/mods/where-this-at>)\n\
-            - [AutoSort](<https://www.curseforge.com/hytale/mods/autosort>)\n\
-            - [Bigger ore stacks](<https://legacy.curseforge.com/hytale/mods/bigger-ore-stacks>)\n\n",
+            - [EyeSpy](<https://legacy.curseforge.com/hytale/mods/eyespy>) - tells you what block you are looking at\n\
+            - [BetterMap](<https://legacy.curseforge.com/hytale/mods/bettermap>) - larger, shared world map \n\
+            - [Where this at?](<https://legacy.curseforge.com/hytale/mods/where-this-at>) - lazy storage management\n\
+            - [AutoSort](<https://www.curseforge.com/hytale/mods/autosort>) - option to autosort chests/inventory\n\
+            - [Gravestones](<https://www.curseforge.com/hytale/mods/gravestones>) - on death, items to grave not on ground\n\
+            - [Recover Arrows](<https://www.curseforge.com/hytale/mods/recover-arrows>) - pick up arrows from the ground\n\
+            - [Pick block](<https://www.curseforge.com/hytale/mods/pandas-adventure-pick-block>) - MMB creative block picker if item in inventory\n\
+            - [Better wardrobes](<https://www.curseforge.com/hytale/mods/better-wardrobes>) - wardroves can now be used for storage\n\
+            - [Bigger ore stacks](<https://legacy.curseforge.com/hytale/mods/bigger-ore-stacks>) - increase from 25 to 100\n\n",
             games::public_ip(),
             self.port(),
             version,
@@ -97,14 +101,13 @@ impl GameServer for Server<'_> {
 
         match status {
             Ok(s) if s.success() => {
-                format!("The {} server stopped successfully", self.name())
+                format!("{} server stopped", self.name())
             }
-            // Same note as above
             Ok(s) if matches!(s.code(), Some(2)) => {
-                format!("The {} server is already stopped", self.name())
+                format!("{} server already stopped", self.name())
             }
             _ => {
-                format!("The {} server failed to stop, ask Tony", self.name())
+                format!("{} server failed to stop, ask Tony", self.name())
             }
         }
     }
@@ -123,7 +126,7 @@ impl GameServer for Server<'_> {
                 self.port(),
             )
         } else {
-            format!("The {} server failed to restart, ask Tony", self.name())
+            format!("{} failed to restart, ask Tony", self.name())
         }
     }
 
