@@ -37,28 +37,27 @@ impl GameServer for Server<'_> {
             Hytale server (version: {2})\n\
             ### Installation\n\
             - Install hytale from [here](<https://www.curseforge.com/download/app>)\n\
-            - Follow purchase/setup instructions\n\
+            - Follow setup instructions\n\
             ### Connection\n\
             - Server > Add Server\n\
             - Connection address: {0}:{1}\n\
             - Name: Brumders\n\
-            - Connect to the server\n\
             - Password prompt: `aids`\n\
             ### Updates\n\
-            The server should detect new patches/versions automatically at 3am and update itself.\n\n\
-            If you need to you can force an update with `/update game hytale`. This will take about 5-10 mins if an update is actually required.\n\
+            The server should detect new versions automatically at 3am and update itself.\n\n\
+            Updates can be forced with `/update game hytale`. This will take about 5-10 mins if an update is actually required.\n\
             ### Mods\n\
-            Mods are all server-side, you don't have to do anything. Currently minimal while Hytale is constantly updating.\n\n\
+            Mods are all server-side, you don't have to do anything. Currently minimal QoL while Hytale is constantly changing.\n\n\
             Installed mods:\n\
             - [EyeSpy](<https://legacy.curseforge.com/hytale/mods/eyespy>) - tells you what block you are looking at\n\
-            - [BetterMap](<https://legacy.curseforge.com/hytale/mods/bettermap>) - larger, shared world map \n\
+            - [BetterMap](<https://legacy.curseforge.com/hytale/mods/bettermap>) - larger world map, shared exploration\n\
             - [Where this at?](<https://legacy.curseforge.com/hytale/mods/where-this-at>) - lazy storage management\n\
             - [AutoSort](<https://www.curseforge.com/hytale/mods/autosort>) - option to autosort chests/inventory\n\
-            - [Gravestones](<https://www.curseforge.com/hytale/mods/gravestones>) - on death, items to grave not on ground\n\
+            - [Gravestones](<https://www.curseforge.com/hytale/mods/gravestones>) - on death, items stored in gravestone\n\
             - [Recover Arrows](<https://www.curseforge.com/hytale/mods/recover-arrows>) - pick up arrows from the ground\n\
-            - [Pick block](<https://www.curseforge.com/hytale/mods/pandas-adventure-pick-block>) - MMB creative block picker if item in inventory\n\
-            - [Better wardrobes](<https://www.curseforge.com/hytale/mods/better-wardrobes>) - wardroves can now be used for storage\n\
-            - [Bigger ore stacks](<https://legacy.curseforge.com/hytale/mods/bigger-ore-stacks>) - increase from 25 to 100\n\n",
+            - [Pick block](<https://www.curseforge.com/hytale/mods/pandas-adventure-pick-block>) - MMB creative block picker when item exists in your inventory\n\
+            - [Better wardrobes](<https://www.curseforge.com/hytale/mods/better-wardrobes>) - wardrobes can now be used for storage\n\
+            - [Bigger ore stacks](<https://legacy.curseforge.com/hytale/mods/bigger-ore-stacks>) - increased from 25 to 100\n\n",
             games::public_ip(),
             self.port(),
             version,
