@@ -148,12 +148,13 @@ impl GameServer for Server<'_> {
             return format!("{} server already latest version", self.name());
         }
 
-        if let Ok(_) = std::process::Command::new("su")
+        if std::process::Command::new("su")
             .arg("-")
             .arg(self.user)
             .arg("-c")
             .arg("/home/gs_hytale/updates/update_hytale_server.sh")
             .status()
+            .is_ok()
         {
             format!(
                 "{} server updated ({}:{})",
