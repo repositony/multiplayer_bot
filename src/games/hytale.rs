@@ -57,6 +57,9 @@ impl GameServer for Server<'_> {
             - [Recover Arrows](<https://www.curseforge.com/hytale/mods/recover-arrows>) - pick up arrows from the ground\n\
             - [Pick block](<https://www.curseforge.com/hytale/mods/pandas-adventure-pick-block>) - MMB creative block picker when item exists in your inventory\n\
             - [Better wardrobes](<https://www.curseforge.com/hytale/mods/better-wardrobes>) - wardrobes can now be used for storage\n\
+            - [Underwater breathing potions](<https://www.curseforge.com/hytale/mods/hazeyones-water-breathing-potions>) - craft potions to extend oxygen timer\n\
+            - [Wormhole items](<https://www.curseforge.com/hytale/mods/recall-wormhole-items>) - crafts to teleport home/to other players\n\
+            - [Endgame content](<https://www.curseforge.com/hytale/mods/endgame-qol>) - added endgame bosses, dungeons, and crafts\n\
             - [Bigger ore stacks](<https://legacy.curseforge.com/hytale/mods/bigger-ore-stacks>) - increased from 25 to 100\n\n",
             games::public_ip(),
             self.port(),
