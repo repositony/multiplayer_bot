@@ -29,12 +29,11 @@ impl GameServer for Server<'_> {
 
     fn help_message(&self) -> String {
         // get release version
-        let version =
-            read_version_from_file(format!("/home/{}/updates/server_version.dat", self.user));
+        // let version =
+        //     read_version_from_file(format!("/home/{}/updates/server_version.dat", self.user));
 
         format!(
             "## Help for Hytale\n\
-            Hytale server (version: {2})\n\
             ### Installation\n\
             - Install hytale from [here](<https://www.curseforge.com/download/app>)\n\
             - Follow setup instructions\n\
@@ -44,26 +43,17 @@ impl GameServer for Server<'_> {
             - Name: Brumders\n\
             - Password prompt: `aids`\n\
             ### Updates\n\
-            The server should detect new versions automatically at 3am and update itself.\n\n\
-            Updates can be forced with `/update game hytale`. This will take about 5-10 mins if an update is actually required.\n\
+            If it tells you a server update is available let Tony know\n\
             ### Mods\n\
-            Mods are all server-side, you don't have to do anything. Currently minimal QoL while Hytale is constantly changing.\n\n\
+            Mods are all server-side, you don't have to do anything.\n\n\
             Installed mods:\n\
-            - [EyeSpy](<https://legacy.curseforge.com/hytale/mods/eyespy>) - tells you what block you are looking at\n\
-            - [BetterMap](<https://legacy.curseforge.com/hytale/mods/bettermap>) - larger world map, shared exploration\n\
-            - [Where this at?](<https://legacy.curseforge.com/hytale/mods/where-this-at>) - lazy storage management\n\
-            - [AutoSort](<https://www.curseforge.com/hytale/mods/autosort>) - option to autosort chests/inventory\n\
-            - [Gravestones](<https://www.curseforge.com/hytale/mods/gravestones>) - on death, items stored in gravestone\n\
-            - [Recover Arrows](<https://www.curseforge.com/hytale/mods/recover-arrows>) - pick up arrows from the ground\n\
-            - [Pick block](<https://www.curseforge.com/hytale/mods/pandas-adventure-pick-block>) - MMB creative block picker when item exists in your inventory\n\
-            - [Better wardrobes](<https://www.curseforge.com/hytale/mods/better-wardrobes>) - wardrobes can now be used for storage\n\
-            - [Underwater breathing potions](<https://www.curseforge.com/hytale/mods/hazeyones-water-breathing-potions>) - craft potions to extend oxygen timer\n\
-            - [Wormhole items](<https://www.curseforge.com/hytale/mods/recall-wormhole-items>) - crafts to teleport home/to other players\n\
-            - [Endgame content](<https://www.curseforge.com/hytale/mods/endgame-qol>) - added endgame bosses, dungeons, and crafts\n\
-            - [Bigger ore stacks](<https://legacy.curseforge.com/hytale/mods/bigger-ore-stacks>) - increased from 25 to 100\n\n",
+            - [BetterMap] - larger world map, shared exploration\n\
+            - [Where this at?] - lazy storage\n\
+            - [Better wardrobes] - wardrobe storage slots\n\
+            - [Underwater breathing potions] - extend oxygen timer\n\
+            - [Recall Grimorie] - craft book for teleporting home\n",
             games::public_ip(),
             self.port(),
-            version,
         )
     }
 
@@ -133,41 +123,42 @@ impl GameServer for Server<'_> {
     }
 
     fn update(&self) -> String {
-        let installed_version =
-            read_version_from_file("/home/gs_hytale/updates/server_version.dat");
-
-        let latest_version = match std::process::Command::new("su")
-            .arg("-")
-            .arg(self.user)
-            .arg("-c")
-            .arg("/home/gs_hytale/updates/hytale_downloader -print-version")
-            .output()
-        {
-            Ok(output) => String::from_utf8_lossy(&output.stdout).trim().to_string(),
-            _ => "none".to_string(),
-        };
-
-        if installed_version == latest_version {
-            return format!("{} server already latest version", self.name());
-        }
-
-        if std::process::Command::new("su")
-            .arg("-")
-            .arg(self.user)
-            .arg("-c")
-            .arg("/home/gs_hytale/updates/update_hytale_server.sh")
-            .status()
-            .is_ok()
-        {
-            format!(
-                "{} server updated ({}:{})",
-                self.name(),
-                games::public_ip(),
-                self.port(),
-            )
-        } else {
-            format!("{} server failed to update, ask Tony", self.name())
-        }
+        // let installed_version =
+        //     read_version_from_file("/home/gs_hytale/updates/server_version.dat");
+        //
+        // let latest_version = match std::process::Command::new("su")
+        //     .arg("-")
+        //     .arg(self.user)
+        //     .arg("-c")
+        //     .arg("/home/gs_hytale/updates/hytale_downloader -print-version")
+        //     .output()
+        // {
+        //     Ok(output) => String::from_utf8_lossy(&output.stdout).trim().to_string(),
+        //     _ => "none".to_string(),
+        // };
+        //
+        // if installed_version == latest_version {
+        //     return format!("{} server already latest version", self.name());
+        // }
+        //
+        // if std::process::Command::new("su")
+        //     .arg("-")
+        //     .arg(self.user)
+        //     .arg("-c")
+        //     .arg("/home/gs_hytale/updates/update_hytale_server.sh")
+        //     .status()
+        //     .is_ok()
+        // {
+        //     format!(
+        //         "{} server updated ({}:{})",
+        //         self.name(),
+        //         games::public_ip(),
+        //         self.port(),
+        //     )
+        // } else {
+        //     format!("{} server failed to update, ask Tony", self.name())
+        // }
+        format!("{} server needs manual update, ask Tony", self.name())
     }
 
     fn status(&self) -> String {
